@@ -824,6 +824,84 @@ describe('AuthorizeHandler integration', function() {
     });
   });
 
+  describe('getCodeChallenge()', function() {
+    describe('with `code_challenge` in the request body', function() {
+      it('should return the code_challenge', function() {
+        var model = {
+          getAccessToken: function() {},
+          getClient: function() {},
+          saveAuthorizationCode: function() {}
+        };
+        var handler = new AuthorizeHandler({ authorizationCodeLifetime: 120, model: model });
+        var request = new Request({ body: { code_challenge: 'foo' }, headers: {}, method: {}, query: {} });
+
+        handler.getCodeChallenge(request).should.equal('foo');
+      });
+    });
+
+    describe('with `code_challenge` in the request query', function() {
+      it('should return the code_challenge', function() {
+        var model = {
+          getAccessToken: function() {},
+          getClient: function() {},
+          saveAuthorizationCode: function() {}
+        };
+        var handler = new AuthorizeHandler({ authorizationCodeLifetime: 120, model: model });
+        var request = new Request({ body: {}, headers: {}, method: {}, query: { code_challenge: 'foo' } });
+
+        handler.getCodeChallenge(request).should.equal('foo');
+      });
+    });
+  });
+
+  describe('getCodeChallengeMethod()', function() {
+    it('should throw an error if `scope` is invalid', function() {
+      var model = {
+        getAccessToken: function() {},
+        getClient: function() {},
+        saveAuthorizationCode: function() {}
+      };
+      var handler = new AuthorizeHandler({ authorizationCodeLifetime: 120, model: model });
+      var request = new Request({ body: { code_challenge_method: 'foo' }, headers: {}, method: {}, query: {} });
+
+      try {
+        handler.getCodeChallengeMethod(request);
+
+        should.fail();
+      } catch (e) {
+        e.should.be.an.instanceOf(InvalidRequestError);
+        e.message.should.equal('Invalid parameter: `code_challenge_method`');
+      }
+    });
+    describe('with `code_challenge_method` in the request body', function() {
+      it('should return the code_challenge_method', function() {
+        var model = {
+          getAccessToken: function() {},
+          getClient: function() {},
+          saveAuthorizationCode: function() {}
+        };
+        var handler = new AuthorizeHandler({ authorizationCodeLifetime: 120, model: model });
+        var request = new Request({ body: { code_challenge_method: 'plain' }, headers: {}, method: {}, query: {} });
+
+        handler.getCodeChallengeMethod(request).should.equal('plain');
+      });
+    });
+
+    describe('with `code_challenge_method` in the request query', function() {
+      it('should return the code_challenge_method', function() {
+        var model = {
+          getAccessToken: function() {},
+          getClient: function() {},
+          saveAuthorizationCode: function() {}
+        };
+        var handler = new AuthorizeHandler({ authorizationCodeLifetime: 120, model: model });
+        var request = new Request({ body: {}, headers: {}, method: {}, query: { code_challenge_method: 'S256' } });
+
+        handler.getCodeChallengeMethod(request).should.equal('S256');
+      });
+    });
+  });
+
   describe('getState()', function() {
     it('should throw an error if `allowEmptyState` is false and `state` is missing', function() {
       var model = {
